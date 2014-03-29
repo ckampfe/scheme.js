@@ -1,4 +1,8 @@
 module.exports = function () {
+  // load in that math eval piece.
+  // We will bind it for context later
+  var mathEval = require('./matheval');
+
   if (!Array.prototype.flatten) {
     Array.prototype.flatten = function () {
       var result = [];
@@ -40,7 +44,7 @@ module.exports = function () {
         list.push(parse(tokens));
       }
 
-    return list;
+      return list;
     } else if (token === ')') {
       throw "parenError";
     } else {
@@ -58,6 +62,7 @@ module.exports = function () {
 
   // MAIN
   return function eval(exp) {
+
     var stack = parse(tokenize(exp));
 
     if (typeof stack === 'string') {
@@ -66,6 +71,10 @@ module.exports = function () {
 
     // eval loop
     return (function rec (stack) {
+      // created a mathEval instance that has a bound default
+      // argument of the function 'rec', so as to have context when mathEval
+      // needs to recur.
+      var boundMathEval = mathEval.bind(undefined, rec);
 
       // truthy/numbery base cases
       if (stack.length === 1) {
@@ -97,60 +106,13 @@ module.exports = function () {
         return rec(current);
 
         // MATH
-      } else if (current === '+') {
-        var result = mathEval(addRed);
-
-        if (stack.length === 0) {
-          return result;
-        }
-
-        return result + rec(stack.shift());
-
-      } else if (current === '-') {
-        var result = mathEval(subRed);
-        if (stack.length === 0) {
-          return result;
-        }
-
-        return result - rec(stack.shift());
-
-      } else if (current === '*') {
-        var result = mathEval(multRed);
-        if (stack.length === 0) {
-          return result;
-        }
-
-        return result * rec(stack.shift());
-
-      } else if (current === '/') {
-        var result = mathEval(divRed);
-
-        if (stack.length === 0) {
-          return result;
-        }
-
-        return result / rec(stack.shift());
-
-      } else if (typeof current === 'number') {
-        return rec(stack);
-        return current;
+      } else if (current === '+'
+              || current === '-'
+              || current === '/'
+              || current === '*') {
+          return boundMathEval(current, stack);
       }
 
-      // create math substack, eval what can be eval'd
-      function mathEval (opFn) {
-        var mathStack = [];
-        while (!Array.isArray(stack[0]) && stack.length > 0) {
-          mathStack.push(stack.shift());
-        }
-
-        return mathStack.reduce(opFn);
-      }
-
-      // mathematical operator callbacks for reduce
-      function addRed (a, b) { return a + b; }
-      function subRed (a, b) { return a - b; }
-      function multRed (a, b) { return a * b; }
-      function divRed (a, b) { return a / b; }
     })(stack);
   }
 }
