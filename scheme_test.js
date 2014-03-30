@@ -45,6 +45,18 @@ describe('#eval()', function () {
       expect(evalScheme('(- 78 (* 5 (- 15 (/ 20 4))))')).to.equal(28);
     });
   });
+
+  describe('CHALLENGE 4: CAR', function () {
+    it('evaluates car of lats', function () {
+      expect(evalScheme("(car '(7 4 2))")).to.equal(7);
     });
+
+    it('evaluates arbitrarily nested cars', function () {
+      expect(
+        evalScheme("(car (car (car '(((45 9 18) 1 9492) (car (1 0 99))))))"))
+        .to.equal(45);
+      expect(evalScheme("(car (car '((8 5) (2 9))))")).to.equal(8);
+    });
+
   });
 });

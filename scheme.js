@@ -29,7 +29,9 @@ module.exports = function () {
 
     // remove spaces
     tokens = tokens.filter(function (token) {
-      return token !== '';
+      return (token !== ''
+           && token !== "\'"
+           && token !== "\\");
     });
 
     return tokens;
@@ -62,7 +64,6 @@ module.exports = function () {
 
   // MAIN
   return function eval(exp) {
-
     var stack = parse(tokenize(exp));
 
     if (typeof stack === 'string') {
@@ -79,21 +80,21 @@ module.exports = function () {
       // truthy/numbery base cases
       if (stack.length === 1) {
         var result = stack[0];
+
         switch (typeof result) {
           case 'string':
             if (result === '#t') {
               return true;
             } else if (result === '#f') {
               return false;
-            } else {
-              return result;
             }
+
             break;
           case 'number':
             return result;
             break;
           default:
-            return result;
+            return rec(result);
             break;
         }
       }
@@ -105,14 +106,19 @@ module.exports = function () {
         // recurse
         return rec(current);
 
-        // MATH
       } else if (current === '+'
               || current === '-'
               || current === '/'
               || current === '*') {
           return boundMathEval(current, stack);
-      }
 
+      } else if (current === 'car') {
+        stack = stack[0];
+        return rec(stack);
+
+      } else if (typeof current === 'number') {
+        return current;
+      }
     })(stack);
   }
 }
