@@ -56,6 +56,7 @@ describe('#eval()', function () {
         evalScheme("(car (car (car '(((45 9 18) 1 9492) (car (1 0 99))))))"))
         .to.equal(45);
       expect(evalScheme("(car (car '((8 5) (2 9))))")).to.equal(8);
+      expect(evalScheme("(+ 88 12 (car '(99 1 3)))")).to.equal(199);
     });
 
   });
