@@ -17,12 +17,12 @@ mocha -R spec scheme_test.js
 
 ###things you can do so far:
 ```
-=> (+ 4 5)
+> evalScheme("(+ 4 5)")
 9
 
-=> (- 78 (* 5 (- 15 (/ 20 4))))
+> evalScheme("(- 78 (* 5 (- 15 (/ 20 4))))")
 28
 
-=> (car '(55 1 88 12))
+> evalScheme("(car '(55 1 88 12))")
 55
 ```
